@@ -13,21 +13,35 @@ var triangleMatrix   = mat4.create()
 var squareMatrix     = mat4.create()
 var projectionMatrix = mat4.create()
 
-var triangle = glBuffer(gl, new Float32Array([
-  +0.0, +1.0, +0.0,
-  -1.0, -1.0, +0.0,
-  +1.0, -1.0, +0.0
-]))
+var triangle = {
+  vertices: glBuffer(gl, new Float32Array([
+    +0.0, +1.0, +0.0,
+    -1.0, -1.0, +0.0,
+    +1.0, -1.0, +0.0
+  ])),
+  colors: glBuffer(gl, new Float32Array([
+    +1.0, +0.0, +0.0,
+    +0.0, +1.0, +0.0,
+    +0.0, +0.0, +1.0
+  ])),
+  length: 3
+}
 
-var square = glBuffer(gl, new Float32Array([
-  +1.0, +1.0, +0.0,
-  -1.0, +1.0, +0.0,
-  +1.0, -1.0, +0.0,
-  -1.0, -1.0, +0.0
-]))
-
-triangle.length = 3
-square.length = 4
+var square = {
+  vertices: glBuffer(gl, new Float32Array([
+    +1.0, +1.0, +0.0,
+    -1.0, +1.0, +0.0,
+    +1.0, -1.0, +0.0,
+    -1.0, -1.0, +0.0
+  ])),
+  colors: glBuffer(gl, new Float32Array([
+    +0.5, +0.5, +1.0,
+    +0.5, +0.5, +1.0,
+    +0.5, +0.5, +1.0,
+    +0.5, +0.5, +1.0
+  ])),
+  length: 4
+}
 
 function render() {
   var width = gl.drawingBufferWidth
@@ -37,6 +51,7 @@ function render() {
   gl.clearColor(0, 0, 0, 1)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   gl.enableVertexAttribArray(0)
+  gl.enableVertexAttribArray(1)
 
   // Calculate projection matrix
   mat4.perspective(projectionMatrix, Math.PI / 4, width / height, 0.1, 100)
@@ -52,15 +67,19 @@ function render() {
   shader.uniforms.uProjection = projectionMatrix
 
   // Draw the triangle
-  triangle.bind()
   shader.uniforms.uModelView = triangleMatrix
+  triangle.vertices.bind()
   gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0)
+  triangle.colors.bind()
+  gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0)
   gl.drawArrays(gl.TRIANGLES, 0, triangle.length)
 
   // Draw the square
-  square.bind()
   shader.uniforms.uModelView = squareMatrix
+  square.vertices.bind()
   gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0)
+  square.colors.bind()
+  gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0)
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 }
 
