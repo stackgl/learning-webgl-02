@@ -10,6 +10,9 @@ var shader = glslify({
   vert: './shader.vert'
 })(gl)
 
+shader.attributes.aPosition.location = 0
+shader.attributes.aColor.location = 1
+
 var triangleMatrix   = mat4.create()
 var squareMatrix     = mat4.create()
 var projectionMatrix = mat4.create()
@@ -68,6 +71,10 @@ function render() {
   // Bind the shader
   shader.bind()
   shader.uniforms.uProjection = projectionMatrix
+
+  // Enable attribute pointers
+  shader.attributes.aPosition.pointer()
+  shader.attributes.aColor.pointer()
 
   // Draw the triangle
   shader.uniforms.uModelView = triangleMatrix
